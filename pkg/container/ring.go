@@ -1,36 +1,42 @@
 package container
 
 type IntRing struct {
-	data             []*int
-	start, end, size int
+	data    []*int
+	pozPut  int
+	pozRead int
 }
 
 // колцевой буфер
 func NewIntRing(size int) *IntRing {
-	return &IntRing{}
+	return &IntRing{
+		pozPut: -1,
+		data:   make([]*int, size),
+	}
 }
 
 // вставка
-func (i *IntRing) Push(n int) {
-	switch {
-	case i.start == i.size:
-		i.start = 0
-		fallthrough
-	case i.end == i.size:
-		i.end = 0
-		fallthrough
-	case i.start == i.end:
-		i.start++
+func (i *IntRing) Put(n int) {
+	i.pozPut++
+	if i.pozPut == len(i.data) {
+		i.pozPut = 0
 	}
-	i.data[i.end] = &n
-	i.end++
+	if i.data[i.pozPut] != nil {
+		i.pozRead = i.pozPut + 1
+	}
+	i.data[i.pozPut] = &n
 }
 
 // получить след
-func (i *IntRing) Get(n *int) *int {
-	ret := i.data[i.start]
-	i.data[i.start] = nil
-	i.start++
-	return ret
+func (i *IntRing) Get() *int {
+	var now *int
+	if i.pozRead == len(i.data) {
+		i.pozRead = 0
+	}
+	if i.data[i.pozRead] != nil {
+		now = i.data[i.pozRead]
+		i.data[i.pozRead] = nil
+		i.pozRead++
+	}
 
+	return now
 }

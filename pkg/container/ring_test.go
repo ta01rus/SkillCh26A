@@ -16,9 +16,9 @@ func TestRing(t *testing.T) {
 
 	for i := 0; i < 1000; i++ {
 		// i := rand.Intn(100) + 1
-		r.Push(i)
+		r.Put(i)
 	}
 
-	log.Panicln(r)
+	log.Println(r)
 
 }
