@@ -11,8 +11,6 @@ RUN git clone https://github.com/ta01rus/SkillCh26A
 RUN go env -w GO111MODULE=auto
 WORKDIR /go/src/SkillCh26A
 
-
-# ENV GO111MODULE=auto
 RUN go mod download
 RUN go build -o cmd/service
 
