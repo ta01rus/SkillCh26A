@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/ta01rus/SkillCh26A/pkg/container"
+	"github.com/ta01rus/SkillCh26A/pkg/logger"
 	rdr "github.com/ta01rus/SkillCh26A/pkg/reader"
 )
 
@@ -19,12 +19,13 @@ const (
 )
 
 func main() {
-	ticker := time.NewTicker(BUFF_TIME_PERIOD)
-
-	ctx, cancel := context.WithCancel(context.Background())
+	var (
+		lg          = logger.NewConsoleLoger()
+		ticker      = time.NewTicker(BUFF_TIME_PERIOD)
+		ctx, cancel = context.WithCancel(context.Background())
+		errChan     = make(chan error)
+	)
 	defer cancel()
-
-	errChan := make(chan error)
 	defer close(errChan)
 
 	// обработка ошибок
@@ -34,7 +35,7 @@ func main() {
 			case <-ctx.Done():
 				return
 			case err := <-errChan:
-				log.Println(err)
+				lg.Error("err: %s", err.Error())
 			}
 		}
 	}(ctx)
@@ -147,7 +148,10 @@ func main() {
 	in3 := worker3(ctx, in2)
 
 	printer := func(ctx context.Context, in <-chan int) {
-		out := make(chan int)
+		var (
+			out = make(chan int)
+		)
+
 		go func() {
 			for {
 				select {
@@ -155,7 +159,7 @@ func main() {
 					close(out)
 					return
 				case num := <-in:
-					log.Println(num)
+					lg.Info("Число: %d\n", num)
 				}
 			}
 		}()
